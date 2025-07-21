@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Course {
+  id          String           @id @default(uuid())
+  title       String           @unique
+  description String
+  classes     Class[]
+  categories  CourseCategory[]
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     String
+}
+
+model Class {
+  id           String         @id @default(uuid())
+  title        String
+  description  String
+  initial_date DateTime
+  final_date   DateTime
+  color        String?
+  courseId     String
+  course       Course         @relation(fields: [courseId], references: [id])
+  students     ClassStudent[]
+}
+
+model Student {
+  id       String         @id @default(uuid())
+  username String         @unique
+  name     String
+  classes  ClassStudent[]
+}
+
+model ClassStudent {
+  id        String   @id @default(uuid())
+  classId   String
+  studentId String
+  createdAt DateTime @default(now())
+  class     Class    @relation(fields: [classId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id])
+}
+
+model Category {
+  id      String           @id @default(uuid())
+  title   String
+  color   String
+  courses CourseCategory[]
+}
+
+model CourseCategory {
+  id         String   @id @default(uuid())
+  courseId   String
+  categoryId String
+  course     Course   @relation(fields: [courseId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model Blog {
+  id         String        @id @default(uuid())
+  title      String
+  cover      String?
+  created_at DateTime      @default(now())
+  likes      Int           @default(0)
+  messages   BlogMessage[]
+}
+
+model BlogMessage {
+  id      String @id @default(uuid())
+  blogId  String
+  content String
+  blog    Blog   @relation(fields: [blogId], references: [id])
+}
